@@ -57,8 +57,6 @@ func init() {
 	log.Out = os.Stdout
 }
 
-log.Info()
-
 func main() {
 	if os.Getenv("DISABLE_TRACING") == "" {
 		log.Info("Tracing enabled.")
