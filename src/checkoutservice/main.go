@@ -230,22 +230,37 @@ func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	// REDEEM COUPON HERE, APPLY THE DISCOUNT TO EVERY PRODUCT HERE
+	// Calculate the total order value before applying the discount
+	fullPriceTotal := pb.Money{CurrencyCode: req.UserCurrency,
+		Units: 0,
+		Nanos: 0}
+	fullPriceTotal = money.Must(money.Sum(fullPriceTotal, *prep.shippingCostLocalized))
+	for _, it := range prep.orderItems {
+		multPrice := money.MultiplySlow(*it.Cost, uint32(it.GetItem().GetQuantity()))
+		fullPriceTotal = money.Must(money.Sum(fullPriceTotal, multPrice))
+	}
+
+	// Redeem the coupon code and apply the discount
 	discountedOrder, err := cs.applyCoupon(ctx, prep, req.CouponCode)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	total := pb.Money{CurrencyCode: req.UserCurrency,
+	// Calculate the discounted price for the order
+	discountedTotal := pb.Money{CurrencyCode: req.UserCurrency,
 		Units: 0,
 		Nanos: 0}
-	total = money.Must(money.Sum(total, *discountedOrder.shippingCostLocalized))
+
+	discountedTotal = money.Must(money.Sum(discountedTotal, *discountedOrder.shippingCostLocalized))
 	for _, it := range discountedOrder.orderItems {
 		multPrice := money.MultiplySlow(*it.Cost, uint32(it.GetItem().GetQuantity()))
-		total = money.Must(money.Sum(total, multPrice))
+		discountedTotal = money.Must(money.Sum(discountedTotal, multPrice))
 	}
 
-	txID, err := cs.chargeCard(ctx, &total, req.CreditCard)
+	// Compute the amount the customer has saved
+	amountSaved := money.Must(money.Sum(fullPriceTotal, money.Negate(discountedTotal)))
+
+	txID, err := cs.chargeCard(ctx, &fullPriceTotal, req.CreditCard)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to charge card: %+v", err)
 	}
@@ -271,7 +286,7 @@ func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq
 	} else {
 		log.Infof("order confirmation email sent to %q", req.Email)
 	}
-	resp := &pb.PlaceOrderResponse{Order: orderResult}
+	resp := &pb.PlaceOrderResponse{Order: orderResult, SavedAmount: &amountSaved}
 	return resp, nil
 }
 
@@ -281,6 +296,7 @@ type orderPrep struct {
 	shippingCostLocalized *pb.Money
 }
 
+// Queries the CouponService and applies the discount
 func (cs *checkoutService) applyCoupon(ctx context.Context, in orderPrep, code string) (*orderPrep, error) {
 	var out = in
 

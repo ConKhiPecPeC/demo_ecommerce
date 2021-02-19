@@ -213,7 +213,10 @@ message PlaceOrderRequest {
   string coupon_code = 7;
 }
 
-message PlaceOrderResponse { OrderResult order = 1; }
+message PlaceOrderResponse {
+  OrderResult order = 1;
+  Money savedAmount = 2;
+}
 
 // ------------Ad service------------------
 
