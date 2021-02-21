@@ -240,10 +240,16 @@ func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq
 		fullPriceTotal = money.Must(money.Sum(fullPriceTotal, multPrice))
 	}
 
+	// Create a Timeout for CouponService
+	clientDeadline := time.Now().Add(200 * time.Millisecond)
+	couponContext, cancel := context.WithDeadline(ctx, clientDeadline)
+	defer cancel()
 	// Redeem the coupon code and apply the discount
-	discountedOrder, err := cs.applyCoupon(ctx, prep, req.CouponCode)
+	discountedOrder, err := cs.applyCoupon(couponContext, prep, req.CouponCode)
+	// If CouponService failed, proceed with full price
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		discountedOrder = &prep
+		log.Error(err)
 	}
 
 	// Calculate the discounted price for the order
