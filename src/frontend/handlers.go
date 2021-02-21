@@ -338,13 +338,12 @@ func (fe *frontendServer) placeOrderHandler(w http.ResponseWriter, r *http.Reque
 		multPrice := money.MultiplySlow(*v.GetCost(), uint32(v.GetItem().GetQuantity()))
 		totalPaid = money.Must(money.Sum(totalPaid, multPrice))
 	}
-
+	totalSaved := *order.SavedAmount
 	currencies, err := fe.getCurrencies(r.Context())
 	if err != nil {
 		renderHTTPError(log, r, w, errors.Wrap(err, "could not retrieve currencies"), http.StatusInternalServerError)
 		return
 	}
-
 	if err := templates.ExecuteTemplate(w, "order", map[string]interface{}{
 		"session_id":      sessionID(r),
 		"request_id":      r.Context().Value(ctxKeyRequestID{}),
@@ -353,6 +352,7 @@ func (fe *frontendServer) placeOrderHandler(w http.ResponseWriter, r *http.Reque
 		"currencies":      currencies,
 		"order":           order.GetOrder(),
 		"total_paid":      &totalPaid,
+		"total_saved":     &totalSaved,
 		"recommendations": recommendations,
 		"platform_css":    plat.css,
 		"platform_name":   plat.provider,

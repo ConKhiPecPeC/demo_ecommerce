@@ -36,6 +36,8 @@
                         <p class="mg-bt"><strong>{{.order.ShippingTrackingId}}</strong></p>
                         <p>Shipping Cost</p>
                         <p class="mg-bt"><strong>{{renderMoney .order.ShippingCost}}</strong></p>
+                        <p>Total Saved with the Coupon</p>
+                        <p class="mg-bt"><strong>{{renderMoney .total_saved}}</strong></p>
                         <p>Total Paid</p>
                         <p class="mg-bt"><strong>{{renderMoney .total_paid}}</strong></p>
                     </div>
