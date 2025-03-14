@@ -47,6 +47,10 @@ metadata:
   name: emailservice
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: emailservice
   ports:
@@ -116,6 +120,10 @@ metadata:
   name: checkoutservice
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: checkoutservice
   ports:
@@ -175,6 +183,10 @@ metadata:
   name: recommendationservice
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: recommendationservice
   ports:
@@ -258,6 +270,10 @@ metadata:
   name: frontend
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: frontend
   ports:
@@ -271,6 +287,10 @@ metadata:
   name: frontend-external
 spec:
   type: NodePort
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: frontend
   ports:
@@ -321,6 +341,10 @@ metadata:
   name: paymentservice
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: paymentservice
   ports:
@@ -379,6 +403,10 @@ metadata:
   name: productcatalogservice
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: productcatalogservice
   ports:
@@ -436,6 +464,10 @@ metadata:
   name: cartservice
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: cartservice
   ports:
@@ -528,6 +560,10 @@ metadata:
   name: currencyservice
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: currencyservice
   ports:
@@ -585,6 +621,10 @@ metadata:
   name: shippingservice
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: shippingservice
   ports:
@@ -638,6 +678,10 @@ metadata:
   name: redis-cart
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: redis-cart
   ports:
@@ -698,6 +742,10 @@ metadata:
   name: adservice
 spec:
   type: ClusterIP
+  ipFamily:
+    - IPv6
+    - IPv4
+  ipFamilyPolicy: PreferDualStack
   selector:
     app: adservice
   ports:
